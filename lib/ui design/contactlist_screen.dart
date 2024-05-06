@@ -67,7 +67,7 @@ class _ContactListScreenState extends State<ContactListScreen> {
                         : null,
                   ),
                   title: Text(
-                    userContact.name ?? '',
+                    userContact.name ?? 'Karthick',
                     style: const TextStyle(fontFamily: MyStrings.outfit),
                   ),
                   subtitle: Text(
@@ -211,6 +211,9 @@ class _ContactListScreenState extends State<ContactListScreen> {
         ContactModel contactModel = ContactModel.fromJson(jsonData);
         setState(() {
           _userContacts = contactModel.userContacts ?? [];
+          if (kDebugMode) {
+            print(_userContacts);
+          }
         });
       } else {
         if (kDebugMode) {
@@ -259,7 +262,7 @@ class ContactModel {
 class UserContacts {
   int? id;
   int? userId;
-  Null? name;
+  String? name;
   String? phone;
   String? createdAt;
   String? updatedAt;
@@ -275,28 +278,29 @@ class UserContacts {
   int? profileStatus;
   int? liteReceivedMsgCount;
   int? liteSentMsgCount;
-  Null? assistantContact;
+  // AssistantContact? assistantContact;
 
   UserContacts(
       {this.id,
-      this.userId,
-      this.name,
-      this.phone,
-      this.createdAt,
-      this.updatedAt,
-      this.companyName,
-      this.jobTitle,
-      this.email,
-      this.dateOfBirth,
-      this.anniversaryDate,
-      this.categoryId,
-      this.countryCode,
-      this.deviceUuid,
-      this.profileImg,
-      this.profileStatus,
-      this.liteReceivedMsgCount,
-      this.liteSentMsgCount,
-      this.assistantContact});
+        this.userId,
+        this.name,
+        this.phone,
+        this.createdAt,
+        this.updatedAt,
+        this.companyName,
+        this.jobTitle,
+        this.email,
+        this.dateOfBirth,
+        this.anniversaryDate,
+        this.categoryId,
+        this.countryCode,
+        this.deviceUuid,
+        this.profileImg,
+        this.profileStatus,
+        this.liteReceivedMsgCount,
+        this.liteSentMsgCount,
+        // this.assistantContact
+      });
 
   UserContacts.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -317,12 +321,14 @@ class UserContacts {
     profileStatus = json['profile_status'];
     liteReceivedMsgCount = json['lite_received_msg_count'];
     liteSentMsgCount = json['lite_sent_msg_count'];
-    assistantContact = json['assistant_contact'];
+    // assistantContact = json['assistant_contact'] != null
+    //     ? new AssistantContact.fromJson(json['assistant_contact'])
+    //     : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
+    final Map<String, dynamic> data = Map<String, dynamic>();
+    data['id'] = id;
     data['user_id'] = this.userId;
     data['name'] = this.name;
     data['phone'] = this.phone;
@@ -338,9 +344,92 @@ class UserContacts {
     data['device_uuid'] = this.deviceUuid;
     data['profile_img'] = this.profileImg;
     data['profile_status'] = this.profileStatus;
-    data['lite_received_msg_count'] = this.liteReceivedMsgCount;
-    data['lite_sent_msg_count'] = this.liteSentMsgCount;
-    data['assistant_contact'] = this.assistantContact;
+    data['lite_received_msg_count'] = liteReceivedMsgCount;
+    data['lite_sent_msg_count'] = liteSentMsgCount;
+    // if (assistantContact != null) {
+    //   data['assistant_contact'] = assistantContact!.toJson();
+    // }
     return data;
   }
 }
+
+// class AssistantContact {
+//   int? assistantId;
+//   int? contactId;
+//   String? threadId;
+//   String? status;
+//   String? createdAt;
+//   String? updatedAt;
+//   int? createdBy;
+//   String? startAt;
+//   String? startAtTimezone;
+//   List<dynamic>? fileIds;
+//   String? assistantName;
+//   String? assistantDesc;
+//   String? assistantAgentName;
+//   int? deviceId;
+//
+//   AssistantContact({
+//     this.assistantId,
+//     this.contactId,
+//     this.threadId,
+//     this.status,
+//     this.createdAt,
+//     this.updatedAt,
+//     this.createdBy,
+//     this.startAt,
+//     this.startAtTimezone,
+//     this.fileIds,
+//     this.assistantName,
+//     this.assistantDesc,
+//     this.assistantAgentName,
+//     this.deviceId,
+//   });
+//
+//   AssistantContact.fromJson(Map<String, dynamic> json) {
+//     assistantId = json['assistant_id'];
+//     contactId = json['contact_id'];
+//     threadId = json['thread_id'];
+//     status = json['status'];
+//     createdAt = json['created_at'];
+//     updatedAt = json['updated_at'];
+//     createdBy = json['created_by'];
+//     startAt = json['start_at'];
+//     startAtTimezone = json['start_at_timezone'];
+//     fileIds = json['file_ids'];
+//     assistantName = json['assistant_name'];
+//     assistantDesc = json['assistant_desc'];
+//     assistantAgentName = json['assistant_agent_name'];
+//     deviceId = json['device_id'];
+//   }
+//
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = <String, dynamic>{};
+//     data['assistant_id'] = assistantId;
+//     data['contact_id'] = contactId;
+//     data['thread_id'] = threadId;
+//     data['status'] = status;
+//     data['created_at'] = createdAt;
+//     data['updated_at'] = updatedAt;
+//     data['created_by'] = createdBy;
+//     data['start_at'] = startAt;
+//     data['start_at_timezone'] = startAtTimezone;
+//     data['file_ids'] = fileIds;
+//     data['assistant_name'] = assistantName;
+//     data['assistant_desc'] = assistantDesc;
+//     data['assistant_agent_name'] = assistantAgentName;
+//     data['device_id'] = deviceId;
+//     return data;
+//   }
+// }
+
+
+
+
+
+
+
+
+
+
+
