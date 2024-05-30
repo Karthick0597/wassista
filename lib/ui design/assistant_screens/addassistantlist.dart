@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:wasissta_project/model_class/provider_class.dart';
 import 'package:wasissta_project/widget/constant.dart';
 import 'package:wasissta_project/widget/string.dart';
-import 'package:http/http.dart' as http;
 
 class AddAssistantList extends StatefulWidget {
   final String name;
@@ -26,7 +25,6 @@ class AddAssistantList extends StatefulWidget {
 class _AddAssistantListState extends State<AddAssistantList> {
   late List<String> updateStatusList;
   String? updateStatus = "";
-  int index =0;
 
   @override
   void initState() {
