@@ -1,11 +1,15 @@
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wasissta_project/utilities/api_constant.dart';
+import '../model_class/contactlist_model.dart';
 import '../widget/constant.dart';
 import '../widget/small_text.dart';
 import '../widget/string.dart';
+import 'package:intl/intl.dart';
 
 class ContactListScreen extends StatefulWidget {
   final bool isSelected;
@@ -21,8 +25,10 @@ class ContactListScreen extends StatefulWidget {
 
 class _ContactListScreenState extends State<ContactListScreen> {
   List<UserContacts> _userContacts = [];
+  List<UserContacts> _filteredContacts = [];
   Map<int, String?> selectedChatTypes = {};
   bool _isLoading = false;
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -32,6 +38,24 @@ class _ContactListScreenState extends State<ContactListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _userContacts.sort((a, b) {
+      if (a.assistantContact?.status == "Active" &&
+          b.assistantContact?.status != "Active") {
+        return -1;
+      } else if (a.assistantContact?.status != "Active" &&
+          b.assistantContact?.status == "Active") {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    _filteredContacts = _userContacts.where((contact) {
+      final name = contact.name?.toLowerCase() ?? '';
+      final phone = contact.phone?.toLowerCase() ?? '';
+      final query = _searchQuery.toLowerCase();
+      return name.contains(query) || phone.contains(query);
+    }).toList();
+
     return Scaffold(
       body: _isLoading
           ? Center(
@@ -40,144 +64,430 @@ class _ContactListScreenState extends State<ContactListScreen> {
                 color: Colors.grey,
               ),
             )
-          : ListView.builder(
-              itemCount: _userContacts.length,
-              itemBuilder: (context, index) {
-                String selectedChatType = selectedChatTypes[index] ?? '';
-                if (selectedChatType.isEmpty) {
-                  selectedChatType = 'Select Chat Type';
-                }
-                UserContacts userContact = _userContacts[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    radius: 25,
-                    backgroundImage: userContact.profileImg != null
-                        ? NetworkImage(userContact.profileImg!)
-                        : null,
-                    child: userContact.profileImg == null
-                        ? Text(
-                            'W',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: primaryColor,
-                              fontFamily: MyStrings.outfit,
-                              letterSpacing: 3,
-                            ),
-                          )
-                        : null,
+          : Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    color: Colors.white,
+                    child: Container(
+                      height: 50,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TextFormField(
+                        onChanged: (value) {
+                          setState(() {
+                            _searchQuery = value;
+                          });
+                        },
+                        cursorColor: primaryColor,
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: Color(0xffBBB2B2),
+                            size: 25,
+                          ), // Search icon
+                          hintText: 'Search Contacts...', // Hint text
+                          hintStyle: TextStyle(
+                              color: Color(0xffBBB2B2),
+                              fontFamily: MyStrings.outfit), // Hint text color
+                          enabledBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
+                          focusedBorder:
+                              UnderlineInputBorder(borderSide: BorderSide.none),
+                        ),
+                      ),
+                    ),
                   ),
-                  title: Text(
-                    userContact.name ?? 'Karthick',
-                    style: const TextStyle(fontFamily: MyStrings.outfit),
-                  ),
-                  subtitle: Text(
-                    userContact.phone ?? 'No Phone',
-                    style: const TextStyle(fontFamily: MyStrings.outfit),
-                  ),
-                  trailing: GestureDetector(
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            width: MediaQuery.of(context).size.width,
-                            height: 150,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 20,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SmallText(
-                                    text: MyStrings.selectTheAssistant,
-                                    fontFamily: MyStrings.outfit,
-                                  ),
-                                  const SizedBox(height: 20),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            selectedChatTypes[index] =
-                                                MyStrings.personalChat;
-                                          });
-                                          Navigator.pop(context);
-                                        },
-                                        child: Container(
-                                          width: 100,
-                                          height: 24,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            color: selectedChatTypes[index] ==
-                                                    MyStrings.personalChat
-                                                ? const Color(0xff00A397)
-                                                : const Color(0xffEDEDED),
-                                          ),
-                                          child: Center(
-                                            child: SmallText(
-                                              text: MyStrings.personalChat,
-                                              size: 10,
-                                              fontFamily: MyStrings.outfit,
-                                              color: selectedChatTypes[index] ==
-                                                      MyStrings.personalChat
-                                                  ? Colors.white
-                                                  : const Color(0xff8B8E8C),
-                                            ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _filteredContacts.length,
+                    itemBuilder: (context, index) {
+                      String selectedChatType = selectedChatTypes[index] ?? '';
+                      if (selectedChatType.isEmpty) {
+                        selectedChatType = 'Select Chat Type';
+                      }
+                      UserContacts userContact = _filteredContacts[index];
+                      return Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 25,
+                              backgroundColor: primaryColor, // Optional: background color while loading
+                              child: ClipOval(
+                                child: userContact.profileImg != null
+                                    ? CachedNetworkImage(
+                                        imageUrl: userContact.profileImg!,
+                                        placeholder: (context, url) =>
+                                            const CircularProgressIndicator(), // Optional: placeholder while loading
+                                        errorWidget: (context, url, error) =>
+                                            const Icon(Icons
+                                                .error), // Optional: error widget
+                                        fit: BoxFit.cover,
+                                        width: 50.0,
+                                        height: 50.0,
+                                      )
+                                    : Center(
+                                        child: Text(
+                                          'W',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: whiteColor,
+                                            fontFamily: MyStrings.outfit,
+                                            letterSpacing: 3,
                                           ),
                                         ),
                                       ),
-                                      // Similar GestureDetector widgets for other chat types
+                              ),
+                            ),
+                            const SizedBox(
+                                width: 10), // Adjust the spacing as needed
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  userContact.name != null
+                                      ? Text(
+                                          userContact.name!,
+                                          style: const TextStyle(
+                                              fontFamily: MyStrings.outfit),
+                                        )
+                                      : const SizedBox(), // To maintain alignment
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          userContact.phone ?? 'No Phone',
+                                          style: const TextStyle(
+                                              fontFamily: MyStrings.outfit),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ],
                               ),
                             ),
-                          );
-                        },
+                            const SizedBox(
+                                width: 10), // Adjust the spacing as needed
+                            GestureDetector(
+                              onTap: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      width: MediaQuery.of(context).size.width,
+                                      height:
+                                          MediaQuery.of(context).size.height /
+                                              1,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 20,
+                                          vertical: 20,
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            SmallText(
+                                              text:
+                                                  MyStrings.selectTheAssistant,
+                                              fontFamily: MyStrings.outfit,
+                                              color: primaryColor,
+                                            ),
+                                            const SizedBox(height: 10),
+                                            Expanded(
+                                              child: ListView.builder(
+                                                shrinkWrap: true,
+                                                itemCount: _userContacts.length,
+                                                itemBuilder: (context, index) {
+                                                  final userContact =
+                                                      _userContacts[index];
+                                                  bool hasAssistantContact = userContact
+                                                              .assistantContact !=
+                                                          null &&
+                                                      userContact
+                                                              .assistantContact!
+                                                              .assistantName !=
+                                                          null &&
+                                                      userContact
+                                                              .assistantContact!
+                                                              .createdAt !=
+                                                          null;
+
+                                                  if (!hasAssistantContact ||
+                                                      userContact
+                                                              .assistantContact!
+                                                              .assistantName ==
+                                                          null ||
+                                                      userContact
+                                                              .assistantContact!
+                                                              .createdAt ==
+                                                          null) {
+                                                    return const SizedBox();
+                                                  }
+
+                                                  if (userContact
+                                                          .assistantContact!
+                                                          .status ==
+                                                      "Active") {
+                                                    return GestureDetector(
+                                                      onTap: () {
+                                                        // Your onTap logic
+                                                      },
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(16),
+                                                        margin: const EdgeInsets
+                                                            .symmetric(
+                                                            horizontal: 16,
+                                                            vertical: 8),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border.all(
+                                                              color:
+                                                                  Colors.grey),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
+                                                        ),
+                                                        child: Row(
+                                                          children: [
+                                                            Expanded(
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    userContact
+                                                                        .assistantContact!
+                                                                        .assistantName
+                                                                        .toString(),
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            MyStrings.outfit),
+                                                                  ),
+                                                                  Text(
+                                                                    DateFormat(
+                                                                            'yyyy-MM-dd')
+                                                                        .format(
+                                                                      DateTime
+                                                                          .parse(
+                                                                        userContact
+                                                                            .assistantContact!
+                                                                            .createdAt
+                                                                            .toString(),
+                                                                      ),
+                                                                    ),
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            MyStrings.outfit),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 10),
+                                                            Container(
+                                                              width: 100,
+                                                              height: 30,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            8),
+                                                                color:
+                                                                    primaryColor, // Use primaryColor for active status
+                                                              ),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  "Active",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color:
+                                                                        whiteColor,
+                                                                    fontFamily:
+                                                                        MyStrings
+                                                                            .outfit,
+                                                                    fontSize:
+                                                                        14,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w300,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    // Display inactive contacts with both assistant name and creation date
+                                                    return GestureDetector(
+                                                      onTap: () {
+                                                        // Your onTap logic
+                                                      },
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(16),
+                                                        margin: const EdgeInsets
+                                                            .symmetric(
+                                                            horizontal: 16,
+                                                            vertical: 8),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border.all(
+                                                              color:
+                                                                  Colors.grey),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
+                                                        ),
+                                                        child: Row(
+                                                          children: [
+                                                            Expanded(
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    userContact
+                                                                        .assistantContact!
+                                                                        .assistantName
+                                                                        .toString(),
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            MyStrings.outfit),
+                                                                  ),
+                                                                  Text(
+                                                                    DateFormat(
+                                                                            'yyyy-MM-dd')
+                                                                        .format(
+                                                                      DateTime
+                                                                          .parse(
+                                                                        userContact
+                                                                            .assistantContact!
+                                                                            .createdAt
+                                                                            .toString(),
+                                                                      ),
+                                                                    ),
+                                                                    style: const TextStyle(
+                                                                        fontFamily:
+                                                                            MyStrings.outfit),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 10),
+                                                            Container(
+                                                              width: 100,
+                                                              height: 30,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            8),
+                                                                color: Colors
+                                                                    .red, // Use red color for inactive status
+                                                              ),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  "Inactive",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color:
+                                                                        whiteColor,
+                                                                    fontFamily:
+                                                                        MyStrings
+                                                                            .outfit,
+                                                                    fontSize:
+                                                                        14,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w300,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: 35,
+                                    height: 35,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: userContact
+                                                  .assistantContact?.status ==
+                                              "Active"
+                                          ? primaryColor // Use primary color if status is active
+                                          : Colors.grey, // Otherwise, use grey
+                                    ),
+                                    child: Icon(
+                                      Icons.smart_toy_outlined,
+                                      color: userContact
+                                                  .assistantContact?.status ==
+                                              "Active"
+                                          ? Colors
+                                              .white // Use white color if status is active
+                                          : Colors.white, // Otherwise, use grey
+                                    ),
+                                  ),
+                                  selectedChatType == 'Select Chat Type'
+                                      ? const SizedBox(width: 0, height: 0)
+                                      : SmallText(
+                                          text: selectedChatType,
+                                          size: 10,
+                                          fontFamily: MyStrings.outfit,
+                                          color: selectedChatType ==
+                                                  "Select Chat Type"
+                                              ? const Color(0xffEDEDED)
+                                              : const Color(0xff00A397),
+                                        ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       );
                     },
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 35,
-                          height: 35,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: selectedChatType == "Select Chat Type"
-                                ? Colors.grey
-                                : Colors.white,
-                          ),
-                          child: Icon(
-                            Icons.smart_toy_outlined,
-                            color: selectedChatType == "Select Chat Type"
-                                ? const Color(0xffEDEDED)
-                                : const Color(0xff00A397),
-                          ),
-                        ),
-                        selectedChatType == 'Select Chat Type'
-                            ? const SizedBox(width: 0, height: 0)
-                            : SmallText(
-                                text: selectedChatType,
-                                size: 10,
-                                fontFamily: MyStrings.outfit,
-                                color: selectedChatType == "Select Chat Type"
-                                    ? const Color(0xffEDEDED)
-                                    : const Color(0xff00A397),
-                              ),
-                      ],
-                    ),
                   ),
-                );
-              },
+                ),
+              ],
             ),
     );
   }
@@ -194,7 +504,7 @@ class _ContactListScreenState extends State<ContactListScreen> {
     }
     try {
       var response = await http.get(
-        Uri.parse('https://wassista.com/api/get_contact_datas'),
+        Uri.parse(ApiConstants.get_contact_datas),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -231,205 +541,3 @@ class _ContactListScreenState extends State<ContactListScreen> {
     }
   }
 }
-
-class ContactModel {
-  String? status;
-  List<UserContacts>? userContacts;
-
-  ContactModel({this.status, this.userContacts});
-
-  ContactModel.fromJson(Map<String, dynamic> json) {
-    status = json['status'];
-    if (json['user_contacts'] != null) {
-      userContacts = <UserContacts>[];
-      json['user_contacts'].forEach((v) {
-        userContacts!.add(new UserContacts.fromJson(v));
-      });
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['status'] = this.status;
-    if (this.userContacts != null) {
-      data['user_contacts'] =
-          this.userContacts!.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
-}
-
-class UserContacts {
-  int? id;
-  int? userId;
-  String? name;
-  String? phone;
-  String? createdAt;
-  String? updatedAt;
-  Null? companyName;
-  Null? jobTitle;
-  Null? email;
-  Null? dateOfBirth;
-  Null? anniversaryDate;
-  Null? categoryId;
-  Null? countryCode;
-  String? deviceUuid;
-  String? profileImg;
-  int? profileStatus;
-  int? liteReceivedMsgCount;
-  int? liteSentMsgCount;
-  // AssistantContact? assistantContact;
-
-  UserContacts(
-      {this.id,
-        this.userId,
-        this.name,
-        this.phone,
-        this.createdAt,
-        this.updatedAt,
-        this.companyName,
-        this.jobTitle,
-        this.email,
-        this.dateOfBirth,
-        this.anniversaryDate,
-        this.categoryId,
-        this.countryCode,
-        this.deviceUuid,
-        this.profileImg,
-        this.profileStatus,
-        this.liteReceivedMsgCount,
-        this.liteSentMsgCount,
-        // this.assistantContact
-      });
-
-  UserContacts.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    userId = json['user_id'];
-    name = json['name'];
-    phone = json['phone'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-    companyName = json['company_name'];
-    jobTitle = json['job_title'];
-    email = json['email'];
-    dateOfBirth = json['date_of_birth'];
-    anniversaryDate = json['anniversary_date'];
-    categoryId = json['category_id'];
-    countryCode = json['country_code'];
-    deviceUuid = json['device_uuid'];
-    profileImg = json['profile_img'];
-    profileStatus = json['profile_status'];
-    liteReceivedMsgCount = json['lite_received_msg_count'];
-    liteSentMsgCount = json['lite_sent_msg_count'];
-    // assistantContact = json['assistant_contact'] != null
-    //     ? new AssistantContact.fromJson(json['assistant_contact'])
-    //     : null;
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['id'] = id;
-    data['user_id'] = this.userId;
-    data['name'] = this.name;
-    data['phone'] = this.phone;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
-    data['company_name'] = this.companyName;
-    data['job_title'] = this.jobTitle;
-    data['email'] = this.email;
-    data['date_of_birth'] = this.dateOfBirth;
-    data['anniversary_date'] = this.anniversaryDate;
-    data['category_id'] = this.categoryId;
-    data['country_code'] = this.countryCode;
-    data['device_uuid'] = this.deviceUuid;
-    data['profile_img'] = this.profileImg;
-    data['profile_status'] = this.profileStatus;
-    data['lite_received_msg_count'] = liteReceivedMsgCount;
-    data['lite_sent_msg_count'] = liteSentMsgCount;
-    // if (assistantContact != null) {
-    //   data['assistant_contact'] = assistantContact!.toJson();
-    // }
-    return data;
-  }
-}
-
-// class AssistantContact {
-//   int? assistantId;
-//   int? contactId;
-//   String? threadId;
-//   String? status;
-//   String? createdAt;
-//   String? updatedAt;
-//   int? createdBy;
-//   String? startAt;
-//   String? startAtTimezone;
-//   List<dynamic>? fileIds;
-//   String? assistantName;
-//   String? assistantDesc;
-//   String? assistantAgentName;
-//   int? deviceId;
-//
-//   AssistantContact({
-//     this.assistantId,
-//     this.contactId,
-//     this.threadId,
-//     this.status,
-//     this.createdAt,
-//     this.updatedAt,
-//     this.createdBy,
-//     this.startAt,
-//     this.startAtTimezone,
-//     this.fileIds,
-//     this.assistantName,
-//     this.assistantDesc,
-//     this.assistantAgentName,
-//     this.deviceId,
-//   });
-//
-//   AssistantContact.fromJson(Map<String, dynamic> json) {
-//     assistantId = json['assistant_id'];
-//     contactId = json['contact_id'];
-//     threadId = json['thread_id'];
-//     status = json['status'];
-//     createdAt = json['created_at'];
-//     updatedAt = json['updated_at'];
-//     createdBy = json['created_by'];
-//     startAt = json['start_at'];
-//     startAtTimezone = json['start_at_timezone'];
-//     fileIds = json['file_ids'];
-//     assistantName = json['assistant_name'];
-//     assistantDesc = json['assistant_desc'];
-//     assistantAgentName = json['assistant_agent_name'];
-//     deviceId = json['device_id'];
-//   }
-//
-//   Map<String, dynamic> toJson() {
-//     final Map<String, dynamic> data = <String, dynamic>{};
-//     data['assistant_id'] = assistantId;
-//     data['contact_id'] = contactId;
-//     data['thread_id'] = threadId;
-//     data['status'] = status;
-//     data['created_at'] = createdAt;
-//     data['updated_at'] = updatedAt;
-//     data['created_by'] = createdBy;
-//     data['start_at'] = startAt;
-//     data['start_at_timezone'] = startAtTimezone;
-//     data['file_ids'] = fileIds;
-//     data['assistant_name'] = assistantName;
-//     data['assistant_desc'] = assistantDesc;
-//     data['assistant_agent_name'] = assistantAgentName;
-//     data['device_id'] = deviceId;
-//     return data;
-//   }
-// }
-
-
-
-
-
-
-
-
-
-
-

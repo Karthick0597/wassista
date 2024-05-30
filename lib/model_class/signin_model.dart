@@ -34,20 +34,20 @@ class User {
   String? wallet;
   String? role;
   String? email;
-  String? phone;
-  String? address;
-  String? emailVerifiedAt;
-  int? status;
-  String? meta;
-  String? plan;
-  int? planId;
-  String? willExpire;
-  String? wlPlan;
-  String? wbPlan;
-  String? igPlan;
-  String? createdAt;
-  String? updatedAt;
-  String? googleId;
+  // String? phone;
+  // String? address;
+  // String? emailVerifiedAt;
+  // int? status;
+  // String? meta;
+  // String? plan;
+  // int? planId;
+  // int? willExpire;
+  // int? wlPlan;
+  // int? wbPlan;
+  // int? igPlan;
+  // int? createdAt;
+  // int? updatedAt;
+  // int? googleId;
 
   User(
       {this.id,
@@ -57,20 +57,21 @@ class User {
         this.wallet,
         this.role,
         this.email,
-        this.phone,
-        this.address,
-        this.emailVerifiedAt,
-        this.status,
-        this.meta,
-        this.plan,
-        this.planId,
-        this.willExpire,
-        this.wlPlan,
-        this.wbPlan,
-        this.igPlan,
-        this.createdAt,
-        this.updatedAt,
-        this.googleId});
+        // this.phone,
+        // this.address,
+        // this.emailVerifiedAt,
+        // this.status,
+        // this.meta,
+        // this.plan,
+        // this.planId,
+        // this.willExpire,
+        // this.wlPlan,
+        // this.wbPlan,
+        // this.igPlan,
+        // this.createdAt,
+        // this.updatedAt,
+        // this.googleId
+      });
 
   User.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -80,20 +81,20 @@ class User {
     wallet = json['wallet'];
     role = json['role'];
     email = json['email'];
-    phone = json['phone'];
-    address = json['address'];
-    emailVerifiedAt = json['email_verified_at'];
-    status = json['status'];
-    meta = json['meta'];
-    plan = json['plan'];
-    planId = json['plan_id'];
-    willExpire = json['will_expire'];
-    wlPlan = json['wl_plan'];
-    wbPlan = json['wb_plan'];
-    igPlan = json['ig_plan'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
-    googleId = json['google_id'];
+    // phone = json['phone'];
+    // address = json['address'];
+    // emailVerifiedAt = json['email_verified_at'];
+    // status = json['status'];
+    // meta = json['meta'];
+    // plan = json['plan'];
+    // planId = json['plan_id'];
+    // willExpire = json['will_expire'];
+    // wlPlan = json['wl_plan'];
+    // wbPlan = json['wb_plan'];
+    // igPlan = json['ig_plan'];
+    // createdAt = json['created_at'];
+    // updatedAt = json['updated_at'];
+    // googleId = json['google_id'];
   }
 
   Map<String, dynamic> toJson() {
@@ -105,20 +106,20 @@ class User {
     data['wallet'] = this.wallet;
     data['role'] = this.role;
     data['email'] = this.email;
-    data['phone'] = this.phone;
-    data['address'] = this.address;
-    data['email_verified_at'] = this.emailVerifiedAt;
-    data['status'] = this.status;
-    data['meta'] = this.meta;
-    data['plan'] = this.plan;
-    data['plan_id'] = this.planId;
-    data['will_expire'] = this.willExpire;
-    data['wl_plan'] = this.wlPlan;
-    data['wb_plan'] = this.wbPlan;
-    data['ig_plan'] = this.igPlan;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
-    data['google_id'] = this.googleId;
+    // data['phone'] = this.phone;
+    // data['address'] = this.address;
+    // data['email_verified_at'] = this.emailVerifiedAt;
+    // data['status'] = this.status;
+    // data['meta'] = this.meta;
+    // data['plan'] = this.plan;
+    // data['plan_id'] = this.planId;
+    // data['will_expire'] = this.willExpire;
+    // data['wl_plan'] = this.wlPlan;
+    // data['wb_plan'] = this.wbPlan;
+    // data['ig_plan'] = this.igPlan;
+    // data['created_at'] = this.createdAt;
+    // data['updated_at'] = this.updatedAt;
+    // data['google_id'] = this.googleId;
     return data;
   }
 }

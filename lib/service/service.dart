@@ -8,7 +8,6 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wasissta_project/ui%20design/welocmescreen.dart';
-import '../model_class/contact_model.dart';
 import '../model_class/logout_model.dart';
 import '../model_class/signin_model.dart';
 import '../ui design/signinscreen.dart';
