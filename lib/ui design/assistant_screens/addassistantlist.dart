@@ -1,22 +1,22 @@
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wasissta_project/model_class/provider_class.dart';
 import 'package:wasissta_project/widget/constant.dart';
 import 'package:wasissta_project/widget/string.dart';
-import '../../model_class/provider_class.dart';
+import 'package:http/http.dart' as http;
 
 class AddAssistantList extends StatefulWidget {
   final String name;
   final String assistantId;
   final String contactID;
-  final String status;
 
   const AddAssistantList({
     super.key,
     required this.name,
     required this.assistantId,
     required this.contactID,
-    required this.status,
   });
 
   @override
@@ -25,6 +25,8 @@ class AddAssistantList extends StatefulWidget {
 
 class _AddAssistantListState extends State<AddAssistantList> {
   late List<String> updateStatusList;
+  String? updateStatus = "";
+  int index =0;
 
   @override
   void initState() {
@@ -32,12 +34,21 @@ class _AddAssistantListState extends State<AddAssistantList> {
     updateStatusList = [];
   }
 
-  void toggleStatus(int index) {
-    setState(() {
+  void toggleStatus(int index,AssistantContactListProvider provider,String name) {
+     setState(() {
       updateStatusList[index] =
           updateStatusList[index] == "Active" ? "Inactive" : "Active";
       print(updateStatusList[index]);
-
+      if( updateStatusList[index]  == "Active" ){
+        updateStatus = "Active";
+        print(updateStatus);
+      }else{
+        updateStatus = "Inactive";
+        print(updateStatus);
+      }
+      // fetchUpdateAssistantAPICall(widget.assistantId, widget.contactID, updateStatus?? '');
+      AssistantContactListProvider(). fetchUpdateAssistantContact(
+           widget.assistantId, widget.contactID, updateStatus?? '',name);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           duration: const Duration(milliseconds: 800),
@@ -54,9 +65,9 @@ class _AddAssistantListState extends State<AddAssistantList> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<AssistantContactListProvider>(
       create: (_) => AssistantContactListProvider()
-        ..fetchAddAssistantContact(widget.assistantId)
-        ..fetchUpdateAssistantContact(
-            widget.assistantId, widget.contactID, widget.status),
+        ..fetchAddAssistantContact(widget.assistantId),
+        // ..fetchUpdateAssistantContact(
+        //     widget.assistantId, widget.contactID, updateStatus?? ''),
       builder: (context, child) {
         final provider = Provider.of<AssistantContactListProvider>(context);
         if (updateStatusList.isEmpty && provider.assistantContact.isNotEmpty) {
@@ -152,8 +163,10 @@ class _AddAssistantListState extends State<AddAssistantList> {
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      toggleStatus(
-                                          index); // Toggle status on tap
+                                      toggleStatus(index,provider, provider.assistantContact[index]
+                                          .name ??
+                                          '',);
+                                      print("$index");
                                     },
                                     child: Container(
                                       width: 75,

@@ -99,13 +99,8 @@ class AssistantContactListProvider extends ChangeNotifier {
           'Authorization': 'Bearer $token',
         },
       );
-      if (kDebugMode) {
-        print("hello");
-      }
       if (response.statusCode == 200) {
-        if (kDebugMode) {
-          print("hello");
-        }
+
         if (kDebugMode) {
           print("statuscode:${response.statusCode}");
         }
@@ -150,7 +145,8 @@ class AssistantContactListProvider extends ChangeNotifier {
   }
 
   void fetchUpdateAssistantContact(
-      String assistantID, String contactID, String status) async {
+      String assistantID, String contactID, String status,String name) async {
+    print("name:${name}");
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('authorization');
     if (kDebugMode) {
@@ -159,18 +155,16 @@ class AssistantContactListProvider extends ChangeNotifier {
     try {
       var response = await http.get(
         Uri.parse(
-            '${ApiConstants.update_assistant_status}/$assistantID/$contactID/${status == 'Active' ? 'Inactive' : 'Active'}'),
+            '${ApiConstants.update_assistant_status}/$assistantID/$contactID/$status'),
         headers: {
           'Authorization': 'Bearer $token',
         },
       );
-      if (kDebugMode) {}
       if (kDebugMode) {
         print("contactID $contactID");
         print("status $status");
       }
       if (response.statusCode == 200) {
-        if (kDebugMode) {}
         if (kDebugMode) {
           print("statuscode:${response.statusCode}");
         }

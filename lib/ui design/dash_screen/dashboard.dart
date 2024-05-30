@@ -718,13 +718,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           'Authorization': 'Bearer $token',
         },
       );
-      if (kDebugMode) {
-        print("hello");
-      }
       if (response.statusCode == 200) {
-        if (kDebugMode) {
-          print("hello");
-        }
         if (kDebugMode) {
           print("statuscode:${response.statusCode}");
         }

@@ -106,8 +106,7 @@ class _AssistantListScreenState extends State<AssistantListScreen> {
                                         '',
                                     contactID: "${provider.assistantList[index].contactId}"??
                                         '',
-                                    status: "${provider.assistantList[index].status}"??
-                                        '',
+
                                   ),
                                 ),
                               );

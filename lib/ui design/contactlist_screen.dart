@@ -512,9 +512,6 @@ class _ContactListScreenState extends State<ContactListScreen> {
 
       if (response.statusCode == 200) {
         if (kDebugMode) {
-          print("hello");
-        }
-        if (kDebugMode) {
           print("statuscode:${response.statusCode}");
         }
         var jsonData = json.decode(response.body);
