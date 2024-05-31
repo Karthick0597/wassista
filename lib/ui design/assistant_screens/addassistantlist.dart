@@ -1,5 +1,5 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wasissta_project/model_class/provider_class.dart';
@@ -32,30 +32,50 @@ class _AddAssistantListState extends State<AddAssistantList> {
     updateStatusList = [];
   }
 
-  void toggleStatus(int index,AssistantContactListProvider provider,String name) {
-     setState(() {
+  void toggleStatus(
+      int index, AssistantContactListProvider provider, String name) {
+    setState(() {
       updateStatusList[index] =
           updateStatusList[index] == "Active" ? "Inactive" : "Active";
-      print(updateStatusList[index]);
-      if( updateStatusList[index]  == "Active" ){
+      if (kDebugMode) {
+        print(updateStatusList[index]);
+      }
+      if (updateStatusList[index] == "Active") {
         updateStatus = "Active";
-        print(updateStatus);
-      }else{
+        if (kDebugMode) {
+          print(updateStatus);
+        }
+      } else if (updateStatusList[index] == "Inactive"){
         updateStatus = "Inactive";
-        print(updateStatus);
+        if (kDebugMode) {
+          print(updateStatus);
+        }
+      }
+      else {
+      updateStatus = "Deleted";
+      if (kDebugMode) {
+      print(updateStatus);
+      }
       }
       // fetchUpdateAssistantAPICall(widget.assistantId, widget.contactID, updateStatus?? '');
-      AssistantContactListProvider(). fetchUpdateAssistantContact(
-           widget.assistantId, widget.contactID, updateStatus?? '',name);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          duration: const Duration(milliseconds: 800),
-          content: Text(
-            'Status changed to ${updateStatusList[index]}',
-            style: const TextStyle(fontFamily: MyStrings.outfit, fontSize: 12),
+      if( updateStatusList[index] == "Deleted"){
+
+      }else{
+        AssistantContactListProvider().fetchUpdateAssistantContact(
+            widget.assistantId,
+            provider.assistantContact[index].contactId ?? 1,
+            updateStatus ?? '');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: const Duration(milliseconds: 800),
+            content: Text(
+              'Status changed to ${updateStatusList[index]}',
+              style: const TextStyle(fontFamily: MyStrings.outfit, fontSize: 12),
+            ),
           ),
-        ),
-      );
+        );
+      }
+
     });
   }
 
@@ -64,8 +84,8 @@ class _AddAssistantListState extends State<AddAssistantList> {
     return ChangeNotifierProvider<AssistantContactListProvider>(
       create: (_) => AssistantContactListProvider()
         ..fetchAddAssistantContact(widget.assistantId),
-        // ..fetchUpdateAssistantContact(
-        //     widget.assistantId, widget.contactID, updateStatus?? ''),
+      // ..fetchUpdateAssistantContact(
+      //     widget.assistantId, widget.contactID, updateStatus?? ''),
       builder: (context, child) {
         final provider = Provider.of<AssistantContactListProvider>(context);
         if (updateStatusList.isEmpty && provider.assistantContact.isNotEmpty) {
@@ -161,10 +181,15 @@ class _AddAssistantListState extends State<AddAssistantList> {
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      toggleStatus(index,provider, provider.assistantContact[index]
-                                          .name ??
-                                          '',);
-                                      print("$index");
+                                      toggleStatus(
+                                        index,
+                                        provider,
+                                        provider.assistantContact[index].name ??
+                                            '',
+                                      );
+                                      if (kDebugMode) {
+                                        print("$index");
+                                      }
                                     },
                                     child: Container(
                                       width: 75,
@@ -173,7 +198,9 @@ class _AddAssistantListState extends State<AddAssistantList> {
                                         color:
                                             updateStatusList[index] == "Active"
                                                 ? primaryColor
-                                                : Colors.red,
+                                                : updateStatusList[index] == "Inactive"
+                                                ? inActiveColor
+                                                : Colors.yellow,
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Center(

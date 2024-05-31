@@ -100,7 +100,6 @@ class AssistantContactListProvider extends ChangeNotifier {
         },
       );
       if (response.statusCode == 200) {
-
         if (kDebugMode) {
           print("statuscode:${response.statusCode}");
         }
@@ -145,8 +144,10 @@ class AssistantContactListProvider extends ChangeNotifier {
   }
 
   void fetchUpdateAssistantContact(
-      String assistantID, String contactID, String status,String name) async {
-    print("name:${name}");
+    String assistantID,
+    int contactID,
+    String status,
+  ) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('authorization');
     if (kDebugMode) {
