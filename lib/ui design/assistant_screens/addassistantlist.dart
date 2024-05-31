@@ -35,19 +35,21 @@ class _AddAssistantListState extends State<AddAssistantList> {
   void toggleStatus(
       int index, AssistantContactListProvider provider, String name) {
     setState(() {
-      updateStatusList[index] = updateStatusList[index] == "Active" ? "Inactive": updateStatusList[index] == "Inactive" ? "Active" : "Deleted";
+      updateStatusList[index] = updateStatusList[index] == "Active"
+          ? "Inactive"
+          : updateStatusList[index] == "Inactive"
+              ? "Active"
+              : "Deleted";
       if (updateStatusList[index] == "Active") {
         updateStatus = "Active";
-      } else if (updateStatusList[index] == "Inactive"){
+      } else if (updateStatusList[index] == "Inactive") {
         updateStatus = "Inactive";
-      }
-      else {
-      updateStatus = "Deleted";
+      } else {
+        updateStatus = "Deleted";
       }
       // No API call in Deleted Status
-      if( updateStatusList[index] == "Deleted"){
-
-      }else{
+      if (updateStatusList[index] == "Deleted") {
+      } else {
         //API call for changing status
         AssistantContactListProvider().fetchUpdateAssistantContact(
             widget.assistantId,
@@ -58,7 +60,8 @@ class _AddAssistantListState extends State<AddAssistantList> {
             duration: const Duration(milliseconds: 800),
             content: Text(
               'Status changed to ${updateStatusList[index]}',
-              style: const TextStyle(fontFamily: MyStrings.outfit, fontSize: 12),
+              style:
+                  const TextStyle(fontFamily: MyStrings.outfit, fontSize: 12),
             ),
           ),
         );
@@ -100,32 +103,33 @@ class _AddAssistantListState extends State<AddAssistantList> {
             child: Column(
               children: [
                 provider.assistantContact.isEmpty
-                    ?  Center(
-                      child: CircularProgressIndicator(
-                       color: primaryColor,),
-                    )
+                    ? Center(
+                        child: CircularProgressIndicator(
+                          color: primaryColor,
+                          strokeWidth: 4,
+                          backgroundColor: Colors.grey,
+                        ),
+                      )
                     : ListView.builder(
                         scrollDirection: Axis.vertical,
                         shrinkWrap: true,
                         itemCount: provider.assistantContact.length,
                         itemBuilder: (context, index) {
                           return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 8.0),
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Row(
                               children: [
                                 CachedNetworkImage(
-                                  imageUrl: provider.assistantContact[index]
-                                          .profileImg ??
+                                  imageUrl: provider
+                                          .assistantContact[index].profileImg ??
                                       '',
                                   width: 40,
                                   height: 40,
                                   placeholder: (context, url) =>
                                       const CircularProgressIndicator(),
-                                  errorWidget: (context, url, error) =>
-                                       Icon(
+                                  errorWidget: (context, url, error) => Icon(
                                     Icons.error,
-                                    color:inActiveColor,
+                                    color: inActiveColor,
                                     size: 45,
                                   ),
                                 ),
@@ -136,8 +140,7 @@ class _AddAssistantListState extends State<AddAssistantList> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        provider.assistantContact[index]
-                                                .name ??
+                                        provider.assistantContact[index].name ??
                                             '',
                                         style: const TextStyle(
                                           fontFamily: MyStrings.outfit,
@@ -172,21 +175,24 @@ class _AddAssistantListState extends State<AddAssistantList> {
                                     width: 75,
                                     height: 28,
                                     decoration: BoxDecoration(
-                                      color:
-                                          updateStatusList[index] == "Active"
-                                              ? primaryColor
-                                              : updateStatusList[index] == "Inactive"
+                                      color: updateStatusList[index] == "Active"
+                                          ? primaryColor
+                                          : updateStatusList[index] ==
+                                                  "Inactive"
                                               ? inActiveColor
-                                              : Colors.yellow,
+                                              : Colors.grey,
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Center(
                                       child: Text(
                                         updateStatusList[index],
-                                        style:  TextStyle(
+                                        style: TextStyle(
                                           fontFamily: MyStrings.outfit,
                                           fontSize: 10,
-                                          color:updateStatusList[index] == "Deleted"?Colors.red:whiteColor,
+                                          color: updateStatusList[index] ==
+                                                  "Deleted"
+                                              ? whiteColor
+                                              : whiteColor,
                                         ),
                                       ),
                                     ),

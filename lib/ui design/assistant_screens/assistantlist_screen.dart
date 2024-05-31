@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wasissta_project/widget/string.dart';
@@ -17,6 +18,7 @@ class AssistantListScreen extends StatefulWidget {
 
 class _AssistantListScreenState extends State<AssistantListScreen> {
   TextEditingController editingController = TextEditingController();
+  Map<int, bool> switchStates = {};
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +93,8 @@ class _AssistantListScreenState extends State<AssistantListScreen> {
                         shrinkWrap: true,
                         itemCount: provider.assistantList.length,
                         itemBuilder: (context, index) {
+                          bool isSwitched = switchStates[index] ?? true;
+
                           return GestureDetector(
                             onTap: () {
                               provider.setIsSelected(index);
@@ -160,6 +164,21 @@ class _AssistantListScreenState extends State<AssistantListScreen> {
                                             ),
                                           ),
                                         ),
+                                      ),
+                                    ),
+                                    Transform.scale(
+                                      scale: 0.9,
+                                      child: Switch(
+                                        value: isSwitched,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            switchStates[index] = value;
+                                          });
+                                        },
+                                        activeTrackColor: primaryColor,
+                                        inactiveThumbColor: primaryColor,
+                                        activeColor: whiteColor,
+                                        inactiveTrackColor: whiteColor,
                                       ),
                                     )
                                   ],

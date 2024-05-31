@@ -34,6 +34,7 @@ class Assistant {
   int? deviceId;
   int? contactCount;
 
+
   Assistant({
     this.assistantId,
     this.contactId,
