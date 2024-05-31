@@ -28,17 +28,26 @@ class AssistantContactModel {
 class AssistantContacts {
   String? name;
   String? phone;
-  String? profileImg;
+  Null? profileImg;
   String? assistantStatus;
+  String? assistantId;
+  int? contactId;
 
   AssistantContacts(
-      {this.name, this.phone, this.profileImg, this.assistantStatus});
+      {this.name,
+      this.phone,
+      this.profileImg,
+      this.assistantStatus,
+      this.assistantId,
+      this.contactId});
 
   AssistantContacts.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     phone = json['phone'];
     profileImg = json['profile_img'];
     assistantStatus = json['assistant_status'];
+    assistantId = json['assistant_id'];
+    contactId = json['contact_id'];
   }
 
   Map<String, dynamic> toJson() {
@@ -47,6 +56,8 @@ class AssistantContacts {
     data['phone'] = this.phone;
     data['profile_img'] = this.profileImg;
     data['assistant_status'] = this.assistantStatus;
+    data['assistant_id'] = this.assistantId;
+    data['contact_id'] = this.contactId;
     return data;
   }
 }
