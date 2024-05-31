@@ -35,32 +35,20 @@ class _AddAssistantListState extends State<AddAssistantList> {
   void toggleStatus(
       int index, AssistantContactListProvider provider, String name) {
     setState(() {
-      updateStatusList[index] =
-          updateStatusList[index] == "Active" ? "Inactive" : "Active";
-      if (kDebugMode) {
-        print(updateStatusList[index]);
-      }
+      updateStatusList[index] = updateStatusList[index] == "Active" ? "Inactive": updateStatusList[index] == "Inactive" ? "Active" : "Deleted";
       if (updateStatusList[index] == "Active") {
         updateStatus = "Active";
-        if (kDebugMode) {
-          print(updateStatus);
-        }
       } else if (updateStatusList[index] == "Inactive"){
         updateStatus = "Inactive";
-        if (kDebugMode) {
-          print(updateStatus);
-        }
       }
       else {
       updateStatus = "Deleted";
-      if (kDebugMode) {
-      print(updateStatus);
       }
-      }
-      // fetchUpdateAssistantAPICall(widget.assistantId, widget.contactID, updateStatus?? '');
+      // No API call in Deleted Status
       if( updateStatusList[index] == "Deleted"){
 
       }else{
+        //API call for changing status
         AssistantContactListProvider().fetchUpdateAssistantContact(
             widget.assistantId,
             provider.assistantContact[index].contactId ?? 1,
@@ -75,7 +63,6 @@ class _AddAssistantListState extends State<AddAssistantList> {
           ),
         );
       }
-
     });
   }
 
@@ -84,8 +71,6 @@ class _AddAssistantListState extends State<AddAssistantList> {
     return ChangeNotifierProvider<AssistantContactListProvider>(
       create: (_) => AssistantContactListProvider()
         ..fetchAddAssistantContact(widget.assistantId),
-      // ..fetchUpdateAssistantContact(
-      //     widget.assistantId, widget.contactID, updateStatus?? ''),
       builder: (context, child) {
         final provider = Provider.of<AssistantContactListProvider>(context);
         if (updateStatusList.isEmpty && provider.assistantContact.isNotEmpty) {
@@ -102,7 +87,7 @@ class _AddAssistantListState extends State<AddAssistantList> {
                 child: Icon(Icons.more_vert),
               ),
             ],
-            backgroundColor: const Color(0xffEAFFFD),
+            backgroundColor: scaffoldBodyColor,
             centerTitle: true,
             title: Text(
               widget.name,
@@ -114,113 +99,104 @@ class _AddAssistantListState extends State<AddAssistantList> {
             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
             child: Column(
               children: [
-                SizedBox(
-                  height: MediaQuery.of(context).size.height / 1.2,
-                  child: provider.assistantContact.isEmpty
-                      ? const Center(
-                          child: Text(
-                            "",
-                            style: TextStyle(
-                              fontFamily: MyStrings.outfit,
-                              fontSize: 16,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        )
-                      : ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: provider.assistantContact.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Row(
-                                children: [
-                                  CachedNetworkImage(
-                                    imageUrl: provider.assistantContact[index]
-                                            .profileImg ??
-                                        '',
-                                    width: 40,
-                                    height: 40,
-                                    placeholder: (context, url) =>
-                                        const CircularProgressIndicator(),
-                                    errorWidget: (context, url, error) =>
-                                        const Icon(
-                                      Icons.error,
-                                      color: Colors.red,
-                                      size: 45,
-                                    ),
+                provider.assistantContact.isEmpty
+                    ?  Center(
+                      child: CircularProgressIndicator(
+                       color: primaryColor,),
+                    )
+                    : ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: provider.assistantContact.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding:
+                                const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Row(
+                              children: [
+                                CachedNetworkImage(
+                                  imageUrl: provider.assistantContact[index]
+                                          .profileImg ??
+                                      '',
+                                  width: 40,
+                                  height: 40,
+                                  placeholder: (context, url) =>
+                                      const CircularProgressIndicator(),
+                                  errorWidget: (context, url, error) =>
+                                       Icon(
+                                    Icons.error,
+                                    color:inActiveColor,
+                                    size: 45,
                                   ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          provider.assistantContact[index]
-                                                  .name ??
-                                              '',
-                                          style: const TextStyle(
-                                            fontFamily: MyStrings.outfit,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                        Text(
-                                          provider.assistantContact[index]
-                                                  .phone ??
-                                              '',
-                                          style: const TextStyle(
-                                            fontFamily: MyStrings.outfit,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      toggleStatus(
-                                        index,
-                                        provider,
-                                        provider.assistantContact[index].name ??
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        provider.assistantContact[index]
+                                                .name ??
                                             '',
-                                      );
-                                      if (kDebugMode) {
-                                        print("$index");
-                                      }
-                                    },
-                                    child: Container(
-                                      width: 75,
-                                      height: 28,
-                                      decoration: BoxDecoration(
-                                        color:
-                                            updateStatusList[index] == "Active"
-                                                ? primaryColor
-                                                : updateStatusList[index] == "Inactive"
-                                                ? inActiveColor
-                                                : Colors.yellow,
-                                        borderRadius: BorderRadius.circular(4),
+                                        style: const TextStyle(
+                                          fontFamily: MyStrings.outfit,
+                                          fontSize: 12,
+                                        ),
                                       ),
-                                      child: Center(
-                                        child: Text(
-                                          updateStatusList[index],
-                                          style: const TextStyle(
-                                            fontFamily: MyStrings.outfit,
-                                            fontSize: 10,
-                                            color: Colors.white,
-                                          ),
+                                      Text(
+                                        provider.assistantContact[index]
+                                                .phone ??
+                                            '',
+                                        style: const TextStyle(
+                                          fontFamily: MyStrings.outfit,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    toggleStatus(
+                                      index,
+                                      provider,
+                                      provider.assistantContact[index].name ??
+                                          '',
+                                    );
+                                    if (kDebugMode) {
+                                      print("$index");
+                                    }
+                                  },
+                                  child: Container(
+                                    width: 75,
+                                    height: 28,
+                                    decoration: BoxDecoration(
+                                      color:
+                                          updateStatusList[index] == "Active"
+                                              ? primaryColor
+                                              : updateStatusList[index] == "Inactive"
+                                              ? inActiveColor
+                                              : Colors.yellow,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        updateStatusList[index],
+                                        style:  TextStyle(
+                                          fontFamily: MyStrings.outfit,
+                                          fontSize: 10,
+                                          color:updateStatusList[index] == "Deleted"?Colors.red:whiteColor,
                                         ),
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
               ],
             ),
           ),

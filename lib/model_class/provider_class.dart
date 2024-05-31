@@ -86,6 +86,79 @@ class AssistantContactListProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // void fetchAddAssistantContact(String assistantID) async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   var token = prefs.getString('authorization');
+  //   if (kDebugMode) {
+  //     print("access token $token");
+  //   }
+  //   try {
+  //     var response = await http.get(
+  //       Uri.parse('${ApiConstants.get_assistant_contacts}/$assistantID'),
+  //       headers: {
+  //         'Authorization': 'Bearer $token',
+  //       },
+  //     );
+  //     if (response.statusCode == 200) {
+  //       if (kDebugMode) {
+  //         print("statuscode:${response.statusCode}");
+  //       }
+  //       var jsonData = json.decode(response.body);
+  //       AssistantContactModel assistantListModel =
+  //           AssistantContactModel.fromJson(jsonData);
+  //       setContactList(assistantListModel.assistantContacts ?? []);
+  //     } else {
+  //       if (kDebugMode) {
+  //         print('Failed to fetch assistant: ${response.statusCode}');
+  //       }
+  //     }
+  //   } catch (error) {
+  //     if (kDebugMode) {
+  //       print('Error fetching assistant: $error');
+  //     }
+  //   }
+  // }
+
+//Mocked Json Response
+  static const String mockedResponse = '''
+{
+    "status": "success",
+    "assistant_contacts": [
+        {
+            "name": "aji",
+            "phone": "919677925018",
+            "profile_img": null,
+            "assistant_status": "Active",
+            "assistant_id": "asst_ovLoEWFkRzhImfO2INC8mcUv",
+            "contact_id": 79
+        },
+        {
+            "name": "Karthick",
+            "phone": "919080134122",
+            "profile_img": null,
+            "assistant_status": "Active",
+            "assistant_id": "asst_ovLoEWFkRzhImfO2INC8mcUv",
+            "contact_id": 79
+        }, {
+            "name": "Karthick Murugan",
+            "phone": "919876543210",
+            "profile_img": null,
+            "assistant_status": "Active",
+            "assistant_id": "asst_ovLoEWFkRzhImfO2INC8mcUv",
+            "contact_id": 79
+        },
+        {
+            "name": "Zuhail",
+            "phone": "917448874485",
+            "profile_img": null,
+            "assistant_status": "Deleted",
+            "assistant_id": "asst_ovLoEWFkRzhImfO2INC8mcUv",
+            "contact_id": 25
+        }
+    ]
+}
+''';
+
   void fetchAddAssistantContact(String assistantID) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('authorization');
@@ -93,25 +166,15 @@ class AssistantContactListProvider extends ChangeNotifier {
       print("access token $token");
     }
     try {
-      var response = await http.get(
-        Uri.parse('${ApiConstants.get_assistant_contacts}/$assistantID'),
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      );
-      if (response.statusCode == 200) {
-        if (kDebugMode) {
-          print("statuscode:${response.statusCode}");
-        }
-        var jsonData = json.decode(response.body);
-        AssistantContactModel assistantListModel =
-            AssistantContactModel.fromJson(jsonData);
-        setContactList(assistantListModel.assistantContacts ?? []);
-      } else {
-        if (kDebugMode) {
-          print('Failed to fetch assistant: ${response.statusCode}');
-        }
-      }
+      // Simulate the response from the server using the mocked response
+      var responseData = jsonDecode(mockedResponse);
+
+      // Construct AssistantContactModel from mocked response
+      AssistantContactModel assistantListModel =
+      AssistantContactModel.fromJson(responseData);
+
+      // Set the contact list
+      setContactList(assistantListModel.assistantContacts ?? []);
     } catch (error) {
       if (kDebugMode) {
         print('Error fetching assistant: $error');

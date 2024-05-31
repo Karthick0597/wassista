@@ -15,6 +15,7 @@ SharedPreferences? prefs;
 // Color
 Color whiteColor = Colors.white;
 Color primaryColor =  const Color(0xff00A397);
+Color scaffoldBodyColor =  const Color(0xffEAFFFD);
 Color inActiveColor =  const Color(0xffFF0000);
 Color dividerLineColor =  const Color(0xffD9D9D9);
 Color blackColor =  const Color(0xff000000);
