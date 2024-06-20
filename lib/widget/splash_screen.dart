@@ -24,8 +24,8 @@ class _SplashScreenState extends State<SplashScreen> {
           splash: Align(
             alignment: Alignment.center,
             child: SizedBox(
-              height: MediaQuery.of(context).size.height/1.6,
-              width: MediaQuery.of(context).size.width/1.6,
+              height: MediaQuery.of(context).size.height / 1.6,
+              width: MediaQuery.of(context).size.width / 1.6,
               child: Lottie.asset(
                 "asset/json_data/2x.json",
                 fit: BoxFit.cover,

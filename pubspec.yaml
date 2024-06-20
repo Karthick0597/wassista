@@ -61,6 +61,7 @@ dependencies:
   cached_network_image:
   lottie: ^1.0.0
   hidden_drawer_menu:
+  toggle_switch:
 
 
 

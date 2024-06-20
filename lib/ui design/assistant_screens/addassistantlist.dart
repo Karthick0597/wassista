@@ -198,6 +198,7 @@ class _AddAssistantListState extends State<AddAssistantList> {
                                     ),
                                   ),
                                 ),
+
                               ],
                             ),
                           );

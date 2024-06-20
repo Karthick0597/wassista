@@ -34,16 +34,14 @@ class Assistant {
   int? deviceId;
   int? contactCount;
 
-
-  Assistant({
-    this.assistantId,
-    this.contactId,
-    this.status,
-    this.assistantName,
-    this.createdBy,
-    this.deviceId,
-    this.contactCount
-  });
+  Assistant(
+      {this.assistantId,
+      this.contactId,
+      this.status,
+      this.assistantName,
+      this.createdBy,
+      this.deviceId,
+      this.contactCount});
 
   Assistant.fromJson(Map<String, dynamic> json) {
     assistantId = json['assistant_id']?.toString();

@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:toggle_switch/toggle_switch.dart';
 import 'package:wasissta_project/widget/string.dart';
 import '../../widget/constant.dart';
 import '../../model_class/provider_class.dart';
@@ -180,7 +180,9 @@ class _AssistantListScreenState extends State<AssistantListScreen> {
                                         activeColor: whiteColor,
                                         inactiveTrackColor: whiteColor,
                                       ),
-                                    )
+                                    ),
+
+
                                   ],
                                 ),
                               ),

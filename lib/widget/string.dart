@@ -26,7 +26,7 @@ class MyStrings {
   static const String totalDevice = 'Total Device';
   static const String active = 'Active';
   static const String totalMessage = 'Total Message';
-  static const String  totalConversations = ' Total Conversations';
+  static const String totalConversations = ' Total Conversations';
   static const String token = 'Token';
   static const String usedMessage = 'Used Message';
   static const String activeCampaigns = 'Active Campaigns';

@@ -211,7 +211,6 @@ class _HiddenDrawerScreenState extends State<HiddenDrawerScreen> {
       initPositionSelected: 1, // Change initial position to skip the header
       slidePercent: 50,
       isDraggable: true,
-
     );
   }
 }
